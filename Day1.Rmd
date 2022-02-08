@@ -1,0 +1,29 @@
+---
+title: "geoChronR hack-a-thon"
+author: "Dr Tamara Fletcher"
+date: "08/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## setup
+
+```{r}
+install.packages("remotes")
+remotes::install_github("nickmckay/lipdR")
+remotes::install_github("nickmckay/GeoChronR")
+
+library(remotes)
+library(lipdR)
+library(geoChronR)
+```
+
+#Practicum 1
+
+```{r}
+L <- readLipd("https://lipdverse.org/Temp12k/current_version/GEOFAR_KF16_MgCa.Repschlager.2016.lpd")
+```
+
