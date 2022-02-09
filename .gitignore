@@ -1,4 +1,5 @@
 *.lpd
+*.png
 /data
 
 .Rproj.user

@@ -75,7 +75,7 @@ plotChronEns(tana,model.num = 2,truncate.dist = .0001) + ggtitle("Tana Lake - de
 
 ## 4.3 OxCal ----
 #Run OxCal
-tana <- runOxcal(tana,model.num = 3,
+tana <- runOxcal(tana, model.num = 3,
                  lab.id.var = 'LabID', 
                  age.14c.var = 'age14C',
                  age.14c.uncertainty.var = 'age14CUnc', 
@@ -388,7 +388,7 @@ plotTimeseriesEnsRibbons(X = tana.ae,Y = tana.temp, color.line = "red", color.hi
 ##4.4 Banded Age Modelling ----
 
 tana <- runBam(tana,
-               paleo.meas.table.num = 1,
+               paleo.meas.table.num = 3,
                n.ens = 1000,
                model.num = 5,
                make.new = TRUE,
@@ -398,7 +398,7 @@ tana <- runBam(tana,
                             resize = 0, 
                             ns = 1000))
 
-tana.ye <- selectData(tana,var.name = "yearEnsemble",meas.table.num = 1)
+tana.ye <- selectData(tana, var.name = "yearEnsemble", meas.table.num = 1)
 
 tana.ae.bam <- convertAD2BP(tana.ye)
 
@@ -406,7 +406,7 @@ tana.ribbon.plot.bam <- plotTimeseriesEnsRibbons(X = tana.ae.bam,Y = tana.temp)
 
 #we can compare this to the original age model supplied by the paper (which used the Heegaard et al., 2005 model, so a whole other approach)
 
-tana.orig.age <- selectData(tana,var.name = "age",meas.table.num = 1)
+tana.orig.age <- selectData(tana, var.name = "age", meas.table.num = 1)
 
 tana.ribbon.plot.bam <- tana.ribbon.plot.bam +
   geom_line(aes(x = tana.orig.age$values, y = tana.temp$values),color = "red")
@@ -425,20 +425,36 @@ ggarrange(plots = list(tana.ribbon.plot + xlim(c(15000,0)) + ggtitle("Temperatur
 
 tana <- mapAgeEnsembleToPaleoData(tana,
                                   age.var = "ageEnsemble",
-                                  model.num = 6,
+                                  model.num = 1,
                                   paleo.depth.var = "age", 
                                   paleo.meas.table.num = 3)
 
-paleo <- extractTs(tana) %>% ts2tibble()
+tana.ae3.1 <- selectData(tana, var.name = "ageEnsemble", meas.table.num = 3)
 
-paleo$paleoData_variableName
+tana <- mapAgeEnsembleToPaleoData(tana,
+                                  age.var = "ageEnsemble",
+                                  model.num = 2,
+                                  paleo.depth.var = "age", 
+                                  paleo.meas.table.num = 3)
 
-tana.ae3 <- selectData(tana, var.name = "ageEnsemble", meas.table.num = 3)
+tana.ae3.2 <- selectData(tana, var.name = "ageEnsemble", meas.table.num = 3)
+
+tana <- mapAgeEnsembleToPaleoData(tana,
+                                  age.var = "ageEnsemble",
+                                  model.num = 3,
+                                  paleo.depth.var = "age", 
+                                  paleo.meas.table.num = 3)
+
+tana.ae3.3 <- selectData(tana, var.name = "ageEnsemble", meas.table.num = 3)
+
+tana.ae3.5 <- selectData(tana, var.name = "ageensemble", meas.table.num = 3)
+
 tana.wax <- selectData(tana, var.name = "ddwax corrected", meas.table.num = 3)
 
-bacon.plot <- plotTimeseriesEnsRibbons(X = tana.ae3, Y = tana.wax)
-bchron.plot <- plotTimeseriesEnsRibbons(X = tana.ae3, Y = tana.wax)
-oxcal.plot <-  plotTimeseriesEnsRibbons(X = tana.ae3, Y = tana.wax)
-bam.plot <-  plotTimeseriesEnsRibbons(X = tana.ae3, Y = tana.wax)
+bacon.plot <- plotTimeseriesEnsRibbons(X = tana.ae3.1, Y = tana.wax)
+bchron.plot <- plotTimeseriesEnsRibbons(X = tana.ae3.2, Y = tana.wax)
+oxcal.plot <-  plotTimeseriesEnsRibbons(X = tana.ae3.3, Y = tana.wax)
+#bam.plot <-  plotTimeseriesEnsRibbons(X = tana.ae3.5, Y = tana.wax)
+#The BAM file is currently broken. Until it gets fixed you can't make it work. 
 
-ggarrange(plots = list(bacon.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bacon"), bchron.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bchron"), oxcal.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bchron"), bam.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on BAM")), nrow = 2)
+ggarrange(plots = list(bacon.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bacon"), bchron.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bchron"), oxcal.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on Bchron"), oxcal.plot + xlim(c(15000,0)) + ggtitle("18O leafwax on BAM")), nrow = 2)
