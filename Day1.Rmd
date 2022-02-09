@@ -21,9 +21,153 @@ library(lipdR)
 library(geoChronR)
 ```
 
-#Practicum 1
+#Chapter 3
 
 ```{r}
 L <- readLipd("https://lipdverse.org/Temp12k/current_version/GEOFAR_KF16_MgCa.Repschlager.2016.lpd")
+
+L2 <- readLipd("Lapland.Helama.2009.lpd")
+
 ```
+```{r}
+summary_plot <- plotSummary(L, paleo.data.var = "temperature",chron.age.var = "age",chron.depth.var = "depthMid",chron.age.14c.var = NULL)
+summary_plot2 <- plotSummary(L2, paleo.data.var = "temperature",chron.age.var = "age")
+
+```
+Use selectData(L2)  to get variables
+```{r}
+selectData(L2, paleo.or.chron = "paleoData") 
+selectData(L2,  paleo.or.chron = "chronData")
+
+```
+
+
+```{r}
+print(summary_plot)
+```
+
+
+```{r}
+mapLipd(L, color = "blue", size = 5, shape = "square", global = TRUE)
+```
+
+```{r}
+#grab the calibrated temperature record
+temp <- selectData(L,paleo.or.chron = "paleoData")
+
+#grab the original dates from the chronData
+c14 <- selectData(L,paleo.or.chron = "chronData")
+```
+
+
+```{r}
+temp <- selectData(L,paleo.or.chron = "paleoData", var.name = "d18o")
+```
+
+
+```{r}
+mgCa  <- selectData(L,var.name = "mg/ca",paleo.or.chron = "paleoData",table.type = "meas",meas.table.num = 1)
+
+```
+
+```{r}
+eur <- readLipd("https://lipdverse.org/geoChronR-examples/euro/Euro2k.zip")
+
+```
+
+```{r}
+mapLipd(eur,projection = "mollweide",global = TRUE)
+```
+
+```{r}
+TS <- extractTs(eur)
+TS <- as.lipdTs(eur)
+
+```
+
+
+
+```{r}
+summ <- plotSummaryTs(TS,age.var = "year")
+```
+
+
+```{r}
+summ <- plotSummaryTs(TS, age.var = "year", sort.var = "geo_pages2kregion")
+
+
+```
+
+
+```{r}
+ts.tib <- ts2tibble(TS)
+```
+```{r}
+library(dplyr)
+
+filtered.tib <- ts.tib %>% 
+  filter(between(geo_latitude, 30,80) & between(geo_longitude,-30,60)) %>% #restrict the coordinates to just Europe
+   filter(archiveType == "tree") %>% 
+   filter(paleoData_useInGlobalTemperatureAnalysis == TRUE)
+```
+
+```{r}
+nTS <- as.lipdTs(filtered.tib) #convert it back (for now)
+plotSummaryTs(nTS,age.var = "year",f = .1)
+```
+
+```{r}
+longTib <- as.lipdTsTibbleLong(filtered.tib) %>% 
+   dplyr::filter(between(year,1000,2000))
+```
+
+```{r}
+plotTimeseriesStack(longTib,color.var = "paleoData_proxy")
+```
+Exercise 3.5 Explore the options in plotTimeseriesStack. Create a new version that:
+
+Has better colors!
+
+```{r}
+plotTimeseriesStack(longTib,color.var = "paleoData_proxy", color.ramp = function(nColors) {     RColorBrewer::brewer.pal(nColors, "Accent") }
+)
+
+```
+
+Changes the line thickness.
+```{r}
+plotTimeseriesStack(longTib,color.var = "paleoData_proxy", color.ramp = function(nColors) {     RColorBrewer::brewer.pal(nColors, "Accent") }
+, line.size = 1)
+```
+
+
+What does invert.var do?
+
+```{r}
+plotTimeseriesStack(longTib,color.var = "paleoData_proxy", color.ramp = function(nColors) {     RColorBrewer::brewer.pal(nColors, "Accent") }
+, invert.var = c(-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1))
+```
+
+Replot this, but only showing the MXD data.
+```{r}
+filtered.tib2 <- ts.tib %>% 
+  filter(between(geo_latitude, 30,80) & between(geo_longitude,-30,60)) %>% #restrict the coordinates to just Europe
+   filter(archiveType == "tree") %>% 
+   filter(paleoData_useInGlobalTemperatureAnalysis == TRUE) %>%
+  filter(paleoData_proxy == "MXD")
+
+longTib2 <- as.lipdTsTibbleLong(filtered.tib2) %>% 
+   dplyr::filter(between(year,1000,2000))
+
+
+plotTimeseriesStack(longTib2,color.var = "paleoData_proxy", color.ramp = function(nColors) {     RColorBrewer::brewer.pal(nColors, "Accent") }
+)
+```
+
+
+
+
+
+
+
 

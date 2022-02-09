@@ -1,4 +1,4 @@
-.lpd
+*.lpd
 /data
 
 .Rproj.user
